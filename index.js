@@ -1,16 +1,12 @@
 
 var express = require('express');
 var bodyParser = require("body-parser");
-const request = require('request')
-const https = require('https')
-var cors = require('cors')
+const request = require('request');
+var cors = require('cors');
 const dialogflow = require('dialogflow');
-
-const projectId="newagent-onmgvt";
-const languageCode = "en-US";
+var keys = require('./keys.js');
 
 var app = express();
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json()); 
 app.use(cors());
@@ -58,7 +54,6 @@ app.post('/dialogv2',function(req,res){
 app.post("/dialogv1",function(req,res){
 
     console.log("dialogv1 called");
-    console.log(req.body.sessionId);
     const data = JSON.stringify({
         "query":req.body.input,
         "lang": "en",
@@ -83,6 +78,43 @@ app.post("/dialogv1",function(req,res){
         res.send(body);
       });
 })
+
+app.post("/indentdialogv1",function(req,res){
+  try {
+  
+      console.log("dialogv1 called");
+      console.log(req.body.sessionId);
+  
+       console.log(keys.V1key[req.body.indent]);
+  
+      const data = JSON.stringify({
+          "query":req.body.input,
+          "lang": "en",
+          "sessionId": req.body.sessionId
+      });
+  
+      request.post({
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization' : 'Bearer ' + keys.V1key[req.body.indent]
+          },
+          url:'https://api.dialogflow.com/v1/query?v=20170712',
+          body:data
+        }, 
+        function(error, response, body){
+            if(error)
+            {
+              console.log(error);
+              res.send(error);
+            }
+          console.log(body);
+          res.send(body);
+        });
+  
+      }catch(e){
+        res.status(500).send(e);
+      }
+  })
  
 var server = app.listen(8081, function () {
     var host = server.address().address
