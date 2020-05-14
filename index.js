@@ -1,10 +1,22 @@
 
 var express = require('express');
 var bodyParser = require("body-parser");
+
+var fs = require("fs");
+var https = require("https");
+var http = require("https");
+
 const request = require('request');
 var cors = require('cors');
 const dialogflow = require('dialogflow');
 var keys = require('./keys.js');
+
+// var key = fs.readFileSync('encryption/private.key');
+// var cert = fs.readFileSync( 'encryption/primary.crt' );
+// var ca = fs.readFileSync( 'encryption/intermediate.crt' );
+var privateKey = fs.readFileSync('./ssl/server.key');
+var certificate = fs.readFileSync('./ssl/server.crt');
+var credentials = {key: privateKey, cert: certificate};
 
 var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -63,7 +75,7 @@ app.post("/dialogv1",function(req,res){
     request.post({
         headers: {
             'Content-Type': 'application/json',
-            'Authorization' : 'Bearer ddb4b9ae436343cea357bd9ff4d8ec81'
+            'Authorization' : 'Bearer 8c58652cfeef4ba9bc5860ed2c03b68f'
         },
         url:'https://api.dialogflow.com/v1/query?v=20170712',
         body:data
@@ -115,9 +127,24 @@ app.post("/indentdialogv1",function(req,res){
         res.status(500).send(e);
       }
   })
+
+  
  
 var server = app.listen(8081, function () {
     var host = server.address().address
     var port = server.address().port   
     console.log("app listening at http://%s:%s", host, port)
- })
+ });
+
+ var secureServer = https.createServer(credentials, app).listen(8082, () => {  
+  console.log(">> CentraliZr listening at port " + 8082);  
+}); 
+
+ 
+
+
+
+
+
+
+ 
