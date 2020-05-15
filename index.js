@@ -24,7 +24,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.get('/', function (req, res) {
-   res.send('works');
+  res.sendFile('index.html', { root: __dirname });
 });
 
 app.post('/dialogv2',function(req,res){
@@ -97,7 +97,7 @@ app.post("/indentdialogv1",function(req,res){
       console.log("dialogv1 called");
       console.log(req.body.sessionId);
   
-       console.log(keys.V1key[req.body.indent]);
+       console.log(keys.V1key[req.body.agent]);
   
       const data = JSON.stringify({
           "query":req.body.input,
